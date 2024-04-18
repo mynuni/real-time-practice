@@ -1,0 +1,17 @@
+<!doctype html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <script th:src="@{/js/polling/polling.js}"></script>
+    <title>Polling</title>
+</head>
+<body>
+<h1>Polling Page</h1>
+<form>
+    <input type="text" id="message" name="message" placeholder="메시지를 입력해주세요.">
+    <button type="button" id="send-message-button">전송</button>
+</form>
+<ul id="message-container">
+</ul>
+</body>
+</html>
