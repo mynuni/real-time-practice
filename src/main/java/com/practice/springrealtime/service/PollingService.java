@@ -21,9 +21,8 @@ public class PollingService {
                 .toList();
     }
 
-    public void saveMessage(MessageRequest messageRequest) {
-        // TODO: "ABC" needs to be replaced with the session id
-        Message message = new Message("ABC", messageRequest.message());
+    public void saveMessage(String sessionId, MessageRequest messageRequest) {
+        Message message = new Message(sessionId, messageRequest.message());
         messageRepository.saveMessage(message);
     }
 

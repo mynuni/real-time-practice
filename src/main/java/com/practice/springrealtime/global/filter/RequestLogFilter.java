@@ -1,4 +1,4 @@
-package com.practice.springrealtime.filter;
+package com.practice.springrealtime.global.filter;
 
 import jakarta.servlet.*;
 import jakarta.servlet.http.HttpServletRequest;
