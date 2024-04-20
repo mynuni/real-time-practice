@@ -16,4 +16,9 @@ public class PageController {
         return "/polling/polling";
     }
 
+    @GetMapping("/long-polling")
+    public String getLongPollingPage() {
+        return "/polling/long-polling";
+    }
+
 }
