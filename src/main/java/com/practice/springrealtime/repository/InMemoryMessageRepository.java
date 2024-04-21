@@ -32,4 +32,9 @@ public class InMemoryMessageRepository implements MessageRepository {
         return unreadMessages;
     }
 
+    @Override
+    public Message getMessage(int index) {
+        return messageStorage.get(index);
+    }
+
 }

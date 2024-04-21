@@ -10,4 +10,6 @@ public interface MessageRepository {
 
     List<Message> getMessages(String sessionId);
 
+    Message getMessage(int index);
+
 }
