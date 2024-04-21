@@ -21,4 +21,9 @@ public class PageController {
         return "/polling/long-polling";
     }
 
+    @GetMapping("/sse")
+    public String getSsePage() {
+        return "/sse/sse";
+    }
+
 }
