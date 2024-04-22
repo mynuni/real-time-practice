@@ -26,4 +26,9 @@ public class PageController {
         return "/sse/sse";
     }
 
+    @GetMapping("/websocket")
+    public String getWebSocketPage() {
+        return "/websocket/websocket";
+    }
+
 }
