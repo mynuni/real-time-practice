@@ -1,0 +1,19 @@
+<!doctype html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <script th:src="@{https://cdn.jsdelivr.net/npm/sockjs-client@1/dist/sockjs.min.js}"></script>
+    <script th:src="@{https://cdnjs.cloudflare.com/ajax/libs/stomp.js/2.3.3/stomp.min.js}"></script>
+    <script th:src="@{/js/websocket/stomp.js}"></script>
+    <title>WebSocket</title>
+</head>
+<body>
+<h1>Stomp Page</h1>
+<form>
+    <input type="text" id="message" name="message" placeholder="메시지를 입력해주세요.">
+    <button type="button" id="send-message-button">전송</button>
+</form>
+<ul id="message-container">
+</ul>
+</body>
+</html>

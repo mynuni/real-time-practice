@@ -31,4 +31,9 @@ public class PageController {
         return "/websocket/websocket";
     }
 
+    @GetMapping("/websocket/stomp")
+    public String getStompPage() {
+        return "/websocket/stomp";
+    }
+
 }
