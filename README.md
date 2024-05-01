@@ -110,6 +110,90 @@ public DeferredResult<String> longPolling() {
 
 ## 3. Server-Sent Events
 
+### 3.1. 정의
+- HTTP 프로토콜을 이용하여 서버에서 클라이언트로 메시지를 단방향으로 전송하는 기술
+
+### 3.2. 특징
+- 요청-응답 방식이 아닌 최초 커넥션 이후 서버에서 클라이언트로 메시지를 전송
+- 클라이언트 to 서버로의 메시지 전송은 필요하지 않고, 서버 to 클라이언트로의 메시지 전송만 필요한 상황에 적합
+- 마지막 수신 이벤트 ID(Last-Event-ID) 헤더를 이용하여 중복 이벤트 방지, 유실 이벤트 처리 등에 활용 가능
+- 제약 사항
+  - 최대 연결 수 제한: [Chrome](https://issues.chromium.org/issues/40329530) 기준 6개, HTTP/2 이후: 100개(기본값)
+  - 브라우저 호환성 확인 [Can I use](https://caniuse.com/?search=Server-Sent%20Events)
+
+### 3.3. 구현
+<details>
+  <summary>메시지 형식</summary>
+
+```http
+[Request]
+GET /some-connection-end-point HTTP/1.1
+Host: some-host
+Accept: text/event-stream
+```
+
+```http
+[Response]
+HTTP/1.1 200 OK
+Content-Type: text/event-stream
+Transfer-Encoding: chunked
+Cache-Control: no-cache
+Connection: keep-alive
+```
+
+```http
+id: some-id
+event: some-event
+data: some-data
+...
+```
+</details>
+
+- [EventSource](https://github.com/mynuni/real-time-practice/blob/main/src/main/resources/static/js/sse/sse.js) 인터페이스 사용
+```javascript
+const eventSource = new EventSource("/some-connection-end-point");
+
+// onopen, onmessage, onerror 등의 이벤트 핸들러
+eventSource.onmessage = (event) => {
+    // do something
+};
+```
+- Spring [SseEmitter](https://github.com/mynuni/real-time-practice/blob/main/src/main/java/com/practice/springrealtime/controller/SseController.java) 사용
+```java
+@GetMapping(value = "/some-connection-end-point", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
+public SseEmitter connect(@RequestHeader(value = "Last-Event-ID", required = false) Integer lastEventId) {
+  // ...
+  return sseEmitter;
+}
+```
+- 주의 사항
+  - 최초 연결 시 503 Service Unavailable 발생 가능
+    - 연결 후 타임아웃 전까지 메시지가 없으면 무응답으로 간주하여 연결이 끊어짐
+      - 연결 성공 시 이벤트를 바로 전송해주는 것이 좋음
+  - EventSource는 헤더를 설정할 수 없음
+    - 직접 XHR 객체의 헤더를 설정한 후 EventSource를 생성하도록 해야 함
+    - fetch, axios 등을 이용하면 약간 편리해지긴 하나, 라이브러리 사용이 더 편리
+    - event-source-polyfill, fetch-event-source 등을 이용하면 간단하게 설정 가능
+  - EventSource의 `onmessage`는 유형이 `"message"`인 이벤트를 처리
+    - 유형이 다를 경우 이벤트 리스너를 사용하여 처리
+    ```javascript
+      eventSource.addEventListener("유형", (event) => { 
+          // do something
+      });
+      ```
+  - 리버스 프록시 사용 시(Nginx 기준)
+    - HTTP 버전 및 Connection 헤더 확인
+      - upstream 서버로 요청 시 `HTTP/1.0`인 경우 `Connection: close` 헤더를 사용하므로 지속 연결이 끊어질 수 있음
+      - `proxy_set_header Connection ''` 헤더 값 비우기
+      - `proxy_http_version 1.1` 버전 명시
+    - 버퍼링 사용 안 함
+      - 버퍼가 찰 때까지 모았다가 응답을 보내는 경우가 있으므로 실시간성이 떨어질 수 있음
+      - `X-Accel-Buffering: no` SSE 연결에 대한 버퍼링을 사용하지 않도록 헤더 설정
+      - `proxy_buffering off` 설정
+      - 버퍼링 미사용에 따른 부작용이 있을 수 있음
+      
 ## 4. WebSocket
 
 ## 5. STOMP on WebSocket
+
+## 참고
